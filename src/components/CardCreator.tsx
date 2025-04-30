@@ -52,7 +52,8 @@ const CardCreator: React.FC<CardCreatorProps> = ({ onCardInfoChange, cardInfo })
   };
 
   const handleReset = () => {
-    const emptyCard = {
+    const emptyCard: CardInfo = {
+      employeeCode: "",  // Added employeeCode property to fix the TypeScript error
       name: "",
       title: "",
       company: "",
