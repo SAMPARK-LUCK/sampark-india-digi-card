@@ -1,11 +1,64 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from "react";
+import { CardCreator, CardPreview, QRCodeGenerator } from "@/components";
+import { CardInfo } from "@/types";
 
 const Index = () => {
+  const [cardInfo, setCardInfo] = useState<CardInfo>({
+    name: "",
+    title: "",
+    company: "",
+    email: "",
+    phone: "",
+    website: "",
+    address: "",
+    bio: "",
+    theme: "card-gradient-purple",
+  });
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto">
+        <header className="mb-8 text-center">
+          <h1 className="text-4xl font-bold tracking-tight mb-2">
+            DigiCard Fusion
+          </h1>
+          <p className="text-muted-foreground">
+            Create and share your digital business cards with QR codes
+          </p>
+        </header>
+
+        <div className="grid gap-6 md:gap-10 lg:grid-cols-2">
+          <div>
+            <h2 className="text-2xl font-bold tracking-tight mb-4">
+              Card Information
+            </h2>
+            <CardCreator 
+              onCardInfoChange={setCardInfo} 
+              cardInfo={cardInfo} 
+            />
+          </div>
+          
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold tracking-tight mb-4">
+              Preview & Share
+            </h2>
+            
+            <div className="space-y-6">
+              <div className="max-w-sm mx-auto">
+                <CardPreview cardInfo={cardInfo} />
+              </div>
+              
+              <QRCodeGenerator cardInfo={cardInfo} />
+            </div>
+          </div>
+        </div>
+
+        <footer className="mt-16 text-center text-sm text-muted-foreground">
+          <p>
+            DigiCard Fusion - Create, Share, Connect. Your digital business card solution.
+          </p>
+        </footer>
       </div>
     </div>
   );
