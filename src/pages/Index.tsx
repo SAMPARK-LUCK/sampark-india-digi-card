@@ -14,6 +14,8 @@ const Index = () => {
     address: "",
     bio: "",
     theme: "card-gradient-purple",
+    profilePicture: null,
+    companyLogo: null,
   });
 
   return (

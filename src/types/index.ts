@@ -9,4 +9,6 @@ export interface CardInfo {
   address: string;
   bio: string;
   theme: string;
+  profilePicture: string | null;
+  companyLogo: string | null;
 }

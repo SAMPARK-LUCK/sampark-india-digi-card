@@ -7,8 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
+import { User, Building } from "lucide-react";
 import ThemePicker from "./ThemePicker";
 import { CardInfo } from "@/types";
+import ImageUploader from "./ImageUploader";
 
 interface CardCreatorProps {
   onCardInfoChange: (cardInfo: CardInfo) => void;
@@ -35,6 +37,20 @@ const CardCreator: React.FC<CardCreatorProps> = ({ onCardInfoChange, cardInfo })
     });
   };
 
+  const handleImageUpload = (imageType: "profilePicture" | "companyLogo", imageUrl: string) => {
+    onCardInfoChange({
+      ...cardInfo,
+      [imageType]: imageUrl,
+    });
+  };
+
+  const handleImageRemove = (imageType: "profilePicture" | "companyLogo") => {
+    onCardInfoChange({
+      ...cardInfo,
+      [imageType]: null,
+    });
+  };
+
   const handleReset = () => {
     const emptyCard = {
       name: "",
@@ -46,6 +62,8 @@ const CardCreator: React.FC<CardCreatorProps> = ({ onCardInfoChange, cardInfo })
       address: "",
       bio: "",
       theme: "card-gradient-purple",
+      profilePicture: null,
+      companyLogo: null,
     };
     
     onCardInfoChange(emptyCard);
@@ -59,9 +77,10 @@ const CardCreator: React.FC<CardCreatorProps> = ({ onCardInfoChange, cardInfo })
   return (
     <Card className="w-full">
       <Tabs defaultValue="personal">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="personal">Personal Info</TabsTrigger>
           <TabsTrigger value="business">Business</TabsTrigger>
+          <TabsTrigger value="images">Images</TabsTrigger>
           <TabsTrigger value="design">Design</TabsTrigger>
         </TabsList>
         
@@ -158,6 +177,34 @@ const CardCreator: React.FC<CardCreatorProps> = ({ onCardInfoChange, cardInfo })
                   placeholder="A brief description about yourself or your business"
                   value={cardInfo.bio}
                   onChange={handleInputChange}
+                />
+              </div>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="images">
+            <div className="grid gap-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Profile Picture</h3>
+                <ImageUploader
+                  imageUrl={cardInfo.profilePicture}
+                  onImageUpload={(imageUrl) => handleImageUpload("profilePicture", imageUrl)}
+                  onImageRemove={() => handleImageRemove("profilePicture")}
+                  icon={<User className="h-6 w-6" />}
+                  label="Upload Profile Picture"
+                />
+              </div>
+              
+              <Separator />
+              
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Company Logo</h3>
+                <ImageUploader
+                  imageUrl={cardInfo.companyLogo}
+                  onImageUpload={(imageUrl) => handleImageUpload("companyLogo", imageUrl)}
+                  onImageRemove={() => handleImageRemove("companyLogo")}
+                  icon={<Building className="h-6 w-6" />}
+                  label="Upload Company Logo"
                 />
               </div>
             </div>

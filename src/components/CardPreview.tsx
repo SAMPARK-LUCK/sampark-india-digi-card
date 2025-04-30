@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { CardInfo } from "@/types";
 
@@ -10,7 +10,7 @@ interface CardPreviewProps {
 }
 
 const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
-  const { name, title, company, email, phone, website, address, bio, theme } = cardInfo;
+  const { name, title, company, email, phone, website, address, bio, theme, profilePicture, companyLogo } = cardInfo;
   
   // Get initials for the avatar
   const getInitials = (name: string) => {
@@ -28,9 +28,13 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
     <Card className={`w-full overflow-hidden ${theme} text-white p-6`}>
       <div className="flex flex-col items-center text-center space-y-4">
         <Avatar className="w-24 h-24 bg-white/30 hover:scale-105 transition-transform">
-          <AvatarFallback className="text-2xl font-bold">
-            {initials}
-          </AvatarFallback>
+          {profilePicture ? (
+            <AvatarImage src={profilePicture} alt={name} className="object-cover" />
+          ) : (
+            <AvatarFallback className="text-2xl font-bold">
+              {initials}
+            </AvatarFallback>
+          )}
         </Avatar>
         
         <div>
@@ -42,6 +46,18 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
             {company ? ` @ ${company}` : ""}
           </p>
         </div>
+        
+        {companyLogo && (
+          <div className="py-2">
+            <div className="bg-white/90 rounded-lg p-2 w-16 h-16 mx-auto flex items-center justify-center">
+              <img 
+                src={companyLogo} 
+                alt={`${company} logo`} 
+                className="max-w-full max-h-full object-contain"
+              />
+            </div>
+          </div>
+        )}
         
         <Separator className="bg-white/30" />
         
