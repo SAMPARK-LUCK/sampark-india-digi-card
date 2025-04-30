@@ -35,6 +35,11 @@ const themes = [
     class: "card-gradient-pink",
   },
   {
+    id: "card-rathi-group",
+    name: "Rathi Group",
+    class: "card-rathi-group",
+  },
+  {
     id: "card-modern",
     name: "Modern",
     class: "card-modern",

@@ -1,10 +1,15 @@
 
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { CardCreator, CardPreview, QRCodeGenerator } from "@/components";
+import { Button } from "@/components/ui/button";
 import { CardInfo } from "@/types";
+import { Settings } from "lucide-react";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [cardInfo, setCardInfo] = useState<CardInfo>({
+    employeeCode: "",
     name: "",
     title: "",
     company: "",
@@ -21,7 +26,17 @@ const Index = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-6xl mx-auto">
-        <header className="mb-8 text-center">
+        <header className="mb-8 text-center relative">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="absolute right-0 top-0"
+            onClick={() => navigate('/admin')}
+          >
+            <Settings className="h-4 w-4 mr-2" />
+            Admin
+          </Button>
+          
           <h1 className="text-4xl font-bold tracking-tight mb-2">
             DigiCard Fusion
           </h1>

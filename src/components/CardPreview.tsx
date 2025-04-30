@@ -24,6 +24,80 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
 
   const initials = getInitials(name);
 
+  const isRathiTheme = theme === "card-rathi-group";
+
+  if (isRathiTheme) {
+    return (
+      <Card className="w-full overflow-hidden bg-white border-2 border-gray-200 text-black">
+        {/* Top section with name, title and logo */}
+        <div className="p-4">
+          <div className="flex justify-between items-start">
+            <div className="space-y-1">
+              <h2 className="text-xl font-bold uppercase tracking-wide">
+                {name || "FULL NAME"}
+              </h2>
+              <div className="w-12 h-0.5 bg-red-600 mb-1" />
+              <p className="text-sm font-medium">
+                {title || "Job Title"}
+              </p>
+            </div>
+            
+            {companyLogo ? (
+              <img 
+                src={companyLogo} 
+                alt="Company Logo" 
+                className="h-12 w-auto object-contain" 
+              />
+            ) : (
+              <div className="h-12 w-24 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+                Company Logo
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Company banner */}
+        <div className="bg-yellow-400 p-2">
+          <div className="flex justify-between items-center">
+            <h3 className="text-lg font-bold uppercase tracking-wide text-black">
+              {company || "COMPANY NAME"}
+            </h3>
+            <p className="text-xs text-black">
+              {company ? "An ISO 9001:2008 Certified Co." : ""}
+            </p>
+          </div>
+        </div>
+        
+        {/* Contact information */}
+        <div className="p-4 space-y-2">
+          <div className="flex flex-wrap gap-3">
+            {phone && (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">📞</span>
+                <span className="text-sm">{phone}</span>
+              </div>
+            )}
+            
+            {email && (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">📧</span>
+                <span className="text-sm">{email}</span>
+              </div>
+            )}
+            
+            {website && (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">🌐</span>
+                <span className="text-sm">{website}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
+    );
+  }
+
+  // Original card design for other themes
   return (
     <Card className={`w-full overflow-hidden ${theme} text-white p-6`}>
       <div className="flex flex-col items-center text-center space-y-4">

@@ -1,5 +1,7 @@
 
 export interface CardInfo {
+  id?: string;
+  employeeCode: string;
   name: string;
   title: string;
   company: string;
@@ -11,4 +13,10 @@ export interface CardInfo {
   theme: string;
   profilePicture: string | null;
   companyLogo: string | null;
+  isActive?: boolean;
+  lastUpdated?: string;
 }
+
+export type CardCollection = {
+  [employeeCode: string]: CardInfo;
+};
