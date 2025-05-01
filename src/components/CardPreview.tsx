@@ -1,15 +1,21 @@
 
-import React from "react";
+import React, { useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
 import { CardInfo } from "@/types";
+import { Download } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import html2canvas from "html2canvas";
 
 interface CardPreviewProps {
   cardInfo: CardInfo;
 }
 
 const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
+  const { toast } = useToast();
+  const cardRef = useRef<HTMLDivElement>(null);
   const { name, title, company, email, phone, website, address, bio, theme, profilePicture, companyLogo } = cardInfo;
   
   // Get initials for the avatar
@@ -22,84 +28,110 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
       .join("");
   };
 
+  const downloadCard = async () => {
+    if (!cardRef.current) return;
+    
+    try {
+      const canvas = await html2canvas(cardRef.current, { 
+        backgroundColor: null,
+        scale: 2 // Higher quality
+      });
+      
+      const image = canvas.toDataURL("image/png");
+      const link = document.createElement("a");
+      link.href = image;
+      link.download = `${name || 'business'}-card.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      toast({
+        title: "Card Downloaded",
+        description: "Your business card has been downloaded successfully.",
+      });
+    } catch (error) {
+      console.error("Error downloading card:", error);
+      toast({
+        title: "Download Failed",
+        description: "There was an error downloading your card. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const initials = getInitials(name);
 
   const isRathiTheme = theme === "card-rathi-group";
 
-  if (isRathiTheme) {
-    return (
-      <Card className="w-full overflow-hidden bg-white border-2 border-gray-200 text-black">
-        {/* Top section with name, title and logo */}
-        <div className="p-4">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <h2 className="text-xl font-bold uppercase tracking-wide">
-                {name || "FULL NAME"}
-              </h2>
-              <div className="w-12 h-0.5 bg-red-600 mb-1" />
-              <p className="text-sm font-medium">
-                {title || "Job Title"}
-              </p>
-            </div>
-            
-            {companyLogo ? (
-              <img 
-                src={companyLogo} 
-                alt="Company Logo" 
-                className="h-12 w-auto object-contain" 
-              />
-            ) : (
-              <div className="h-12 w-24 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-                Company Logo
-              </div>
-            )}
-          </div>
-        </div>
-        
-        {/* Company banner */}
-        <div className="bg-yellow-400 p-2">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold uppercase tracking-wide text-black">
-              {company || "COMPANY NAME"}
-            </h3>
-            <p className="text-xs text-black">
-              {company ? "An ISO 9001:2008 Certified Co." : ""}
+  const cardContent = isRathiTheme ? (
+    <Card ref={cardRef} className="w-full overflow-hidden bg-white border-2 border-gray-200 text-black">
+      {/* Top section with name, title and logo */}
+      <div className="p-4">
+        <div className="flex justify-between items-start">
+          <div className="space-y-1">
+            <h2 className="text-xl font-bold uppercase tracking-wide">
+              {name || "FULL NAME"}
+            </h2>
+            <div className="w-12 h-0.5 bg-red-600 mb-1" />
+            <p className="text-sm font-medium">
+              {title || "Job Title"}
             </p>
           </div>
+          
+          {companyLogo ? (
+            <img 
+              src={companyLogo} 
+              alt="Company Logo" 
+              className="h-12 w-auto object-contain" 
+            />
+          ) : (
+            <div className="h-12 w-24 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
+              Company Logo
+            </div>
+          )}
         </div>
-        
-        {/* Contact information */}
-        <div className="p-4 space-y-2">
-          <div className="flex flex-wrap gap-3">
-            {phone && (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm">📞</span>
-                <span className="text-sm">{phone}</span>
-              </div>
-            )}
-            
-            {email && (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm">📧</span>
-                <span className="text-sm">{email}</span>
-              </div>
-            )}
-            
-            {website && (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm">🌐</span>
-                <span className="text-sm">{website}</span>
-              </div>
-            )}
-          </div>
+      </div>
+      
+      {/* Company banner */}
+      <div className="bg-yellow-400 p-2">
+        <div className="flex justify-between items-center">
+          <h3 className="text-lg font-bold uppercase tracking-wide text-black">
+            {company || "COMPANY NAME"}
+          </h3>
+          <p className="text-xs text-black">
+            {company ? "An ISO 9001:2008 Certified Co." : ""}
+          </p>
         </div>
-      </Card>
-    );
-  }
-
-  // Original card design for other themes
-  return (
-    <Card className={`w-full overflow-hidden ${theme} text-white p-6`}>
+      </div>
+      
+      {/* Contact information */}
+      <div className="p-4 space-y-2">
+        <div className="flex flex-wrap gap-3">
+          {phone && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm">📞</span>
+              <span className="text-sm">{phone}</span>
+            </div>
+          )}
+          
+          {email && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm">📧</span>
+              <span className="text-sm">{email}</span>
+            </div>
+          )}
+          
+          {website && (
+            <div className="flex items-center space-x-2">
+              <span className="text-sm">🌐</span>
+              <span className="text-sm">{website}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </Card>
+  ) : (
+    <Card ref={cardRef} className={`w-full overflow-hidden ${theme} text-white p-6`}>
       <div className="flex flex-col items-center text-center space-y-4">
         <Avatar className="w-24 h-24 bg-white/30 hover:scale-105 transition-transform">
           {profilePicture ? (
@@ -175,6 +207,20 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
         )}
       </div>
     </Card>
+  );
+
+  return (
+    <div className="space-y-4">
+      {cardContent}
+      <Button 
+        onClick={downloadCard} 
+        variant="outline" 
+        className="w-full"
+      >
+        <Download className="mr-2 h-4 w-4" />
+        Download Card Preview
+      </Button>
+    </div>
   );
 };
 
