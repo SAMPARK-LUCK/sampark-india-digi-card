@@ -36,12 +36,12 @@ const themes = [
   },
   {
     id: "card-rathi-group",
-    name: "Rathi Group",
+    name: "Rathi Group Classic",
     class: "card-rathi-group",
   },
   {
     id: "card-rathi-group1",
-    name: "Rathi Group1",
+    name: "Rathi Group Modern",
     class: "card-rathi-group1",
   },
   {

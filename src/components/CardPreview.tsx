@@ -139,8 +139,19 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
     );
   } else if (theme === "card-rathi-group1") {
     cardContent = (
-      <Card ref={cardRef} className="w-full overflow-hidden bg-white border-2 border-gray-200 text-black">
-        {/* Top section with profile pic, name, and title */}
+      <Card ref={cardRef} className="w-full overflow-hidden bg-white border-2 border-gray-200 text-black relative">
+        {/* Company Logo Watermark */}
+        {companyLogo && (
+          <div className="absolute inset-0 flex items-center justify-center opacity-5 pointer-events-none">
+            <img 
+              src={companyLogo} 
+              alt="Company Watermark"
+              className="max-w-3/4 max-h-3/4 object-contain" 
+            />
+          </div>
+        )}
+        
+        {/* Top section with profile pic, name, and logo */}
         <div className="p-4">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
@@ -216,7 +227,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
           </div>
         </div>
         
-        {/* Company logo */}
+        {/* Company logo at top */}
         <div className="px-4 pb-3 flex justify-between items-center">
           {companyLogo ? (
             <img 
