@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
 import { Download, Share } from "lucide-react";
 import { CardInfo } from "@/types";
+import QRCode from "react-qr-code";
 
 interface QRCodeGeneratorProps {
   cardInfo: CardInfo;
@@ -13,8 +14,8 @@ interface QRCodeGeneratorProps {
 
 const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardInfo }) => {
   const { toast } = useToast();
-  const [qrCode, setQrCode] = useState<string>("");
   const [vCardData, setVCardData] = useState<string>("");
+  const [qrVisible, setQrVisible] = useState<boolean>(true);
 
   useEffect(() => {
     if (!cardInfo.name) return;
@@ -22,11 +23,6 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardInfo }) => {
     // Generate vCard data
     const vCard = generateVCardData(cardInfo);
     setVCardData(vCard);
-
-    // Generate QR code URL using the QR Code API
-    const encodedData = encodeURIComponent(vCard);
-    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodedData}`;
-    setQrCode(qrCodeUrl);
   }, [cardInfo]);
 
   const generateVCardData = (info: CardInfo): string => {
@@ -46,20 +42,35 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardInfo }) => {
   };
 
   const downloadQRCode = () => {
-    if (!qrCode) return;
+    if (!qrVisible || !vCardData) return;
     
-    // Create a temporary link and trigger download
-    const link = document.createElement("a");
-    link.href = qrCode;
-    link.download = `${cardInfo.name || 'business'}-qr-code.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    // Find the SVG element and convert it to a data URL
+    const svg = document.querySelector('.qr-code-svg');
+    if (!svg) return;
     
-    toast({
-      title: "QR Code Downloaded",
-      description: "Your QR code has been downloaded successfully.",
-    });
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      ctx?.drawImage(img, 0, 0);
+      
+      const pngFile = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.download = `${cardInfo.name || 'business'}-qr-code.png`;
+      downloadLink.href = pngFile;
+      downloadLink.click();
+      
+      toast({
+        title: "QR Code Downloaded",
+        description: "Your QR code has been downloaded successfully.",
+      });
+    };
+    
+    img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
   };
 
   const downloadVCard = () => {
@@ -137,24 +148,23 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardInfo }) => {
         
         <CardContent className="pt-6">
           <TabsContent value="qrcode" className="flex flex-col items-center space-y-4">
-            {qrCode ? (
-              <div className="relative w-full max-w-xs mx-auto">
-                <img 
-                  src={qrCode} 
-                  alt="QR Code for contact information" 
-                  className="w-full h-auto drop-shadow-md" 
-                />
-              </div>
-            ) : (
-              <div className="w-48 h-48 bg-muted flex items-center justify-center rounded-lg">
-                <p className="text-muted-foreground">Loading QR Code...</p>
-              </div>
-            )}
+            <div className="relative w-full max-w-xs mx-auto">
+              {/* Using react-qr-code directly for better compatibility with vCard format */}
+              <QRCode 
+                value={vCardData}
+                size={200}
+                className="w-full h-auto drop-shadow-md qr-code-svg"
+                level="M"
+              />
+              <p className="text-center text-sm text-muted-foreground mt-2">
+                Scan to add contact
+              </p>
+            </div>
             
             <Button 
               onClick={downloadQRCode} 
               className="w-full"
-              disabled={!qrCode}
+              disabled={!vCardData}
             >
               <Download className="mr-2 h-4 w-4" />
               Download QR Code

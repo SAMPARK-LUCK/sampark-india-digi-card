@@ -1,5 +1,5 @@
 
-import React, { useRef } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
@@ -17,7 +17,46 @@ interface CardPreviewProps {
 const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
   const { toast } = useToast();
   const cardRef = useRef<HTMLDivElement>(null);
-  const { name, title, company, email, phone, website, address, bio, theme, profilePicture, companyLogo } = cardInfo;
+  const [vCardData, setVCardData] = useState<string>("");
+  
+  const { 
+    name, 
+    title, 
+    company, 
+    email, 
+    phone, 
+    website, 
+    address, 
+    bio, 
+    theme, 
+    profilePicture, 
+    companyLogo,
+    employeeCode
+  } = cardInfo;
+  
+  // Generate vCard data when component mounts
+  useEffect(() => {
+    if (!cardInfo.name) return;
+    const vCard = generateVCardData(cardInfo);
+    setVCardData(vCard);
+  }, [cardInfo]);
+
+  // Function to generate vCard data
+  const generateVCardData = (info: CardInfo): string => {
+    let vCard = "BEGIN:VCARD\nVERSION:3.0\n";
+    if (info.name) vCard += `FN:${info.name}\n`;
+    if (info.title || info.company) {
+      vCard += `ORG:${info.company || ""}\n`;
+      if (info.title) vCard += `TITLE:${info.title}\n`;
+    }
+    if (info.email) vCard += `EMAIL:${info.email}\n`;
+    if (info.phone) vCard += `TEL:${info.phone}\n`;
+    if (info.website) vCard += `URL:${info.website}\n`;
+    if (info.address) vCard += `ADR:;;${info.address};;;\n`;
+    vCard += "END:VCARD";
+    
+    return vCard;
+  };
   
   // Get initials for the avatar
   const getInitials = (name: string) => {
@@ -29,6 +68,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
       .join("");
   };
 
+  // Download the card as an image
   const downloadCard = async () => {
     if (!cardRef.current) return;
     
@@ -60,10 +100,30 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
     }
   };
 
+  // Download vCard when clicking on profile picture
+  const downloadVCard = () => {
+    if (!vCardData) return;
+    
+    const blob = new Blob([vCardData], { type: "text/vcard" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${name || 'contact'}.vcf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Contact Downloaded",
+      description: "Contact information has been downloaded as a vCard.",
+    });
+  };
+
   const initials = getInitials(name);
 
-  // Generate card URL for QR code
-  const cardUrl = window.location.origin + "/view/" + cardInfo.employeeCode;
+  // Generate card URL for QR code - using vCard data directly for contact info
+  const cardUrl = vCardData ? `MECARD:${vCardData}` : "";
 
   // Theme-specific content
   let cardContent;
@@ -164,39 +224,39 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
               </p>
             </div>
             
-            {/* Profile Picture */}
-            <Avatar className="w-16 h-16 border-2 border-yellow-400">
-              {profilePicture ? (
-                <AvatarImage src={profilePicture} alt={name} className="object-cover" />
-              ) : (
-                <AvatarFallback className="text-lg font-bold bg-gray-100 text-gray-700">
-                  {initials}
-                </AvatarFallback>
-              )}
-            </Avatar>
+            {/* Profile Picture - Clickable for vCard download */}
+            <div onClick={downloadVCard} className="cursor-pointer" title="Click to download contact">
+              <Avatar className="w-16 h-16 border-2 border-yellow-400">
+                {profilePicture ? (
+                  <AvatarImage src={profilePicture} alt={name} className="object-cover" />
+                ) : (
+                  <AvatarFallback className="text-lg font-bold bg-gray-100 text-gray-700">
+                    {initials}
+                  </AvatarFallback>
+                )}
+              </Avatar>
+            </div>
           </div>
         </div>
         
         {/* Company banner with Counter-Strike font and logo */}
         <div className="bg-yellow-400 p-2">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-3">
-              {/* Company logo in yellow box */}
-              {companyLogo ? (
-                <img 
-                  src={companyLogo} 
-                  alt="Company Logo" 
-                  className="h-8 w-auto object-contain" 
-                />
-              ) : (
-                <div className="h-8 w-8 bg-white/80 rounded-sm flex items-center justify-center text-xs text-gray-400">
-                  Logo
-                </div>
-              )}
-              <h3 className="text-lg font-bold counter-strike-font text-black">
-                {company || "COMPANY NAME"}
-              </h3>
-            </div>
+          <div className="flex items-center space-x-3">
+            {/* Company logo in yellow box */}
+            {companyLogo ? (
+              <img 
+                src={companyLogo} 
+                alt="Company Logo" 
+                className="h-8 w-auto object-contain" 
+              />
+            ) : (
+              <div className="h-8 w-8 bg-white/80 rounded-sm flex items-center justify-center text-xs text-gray-400">
+                Logo
+              </div>
+            )}
+            <h3 className="text-lg font-bold counter-strike-font text-black">
+              {company || "COMPANY NAME"}
+            </h3>
           </div>
         </div>
         
@@ -225,11 +285,11 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
             )}
           </div>
           
-          {/* QR Code */}
+          {/* QR Code - Now using vCard data directly for contact info */}
           <div className="flex justify-end items-center">
             <div className="bg-white p-1 rounded">
               <QRCode
-                value={cardUrl}
+                value={vCardData}
                 size={70}
                 style={{ height: "auto", maxWidth: "100%", width: "100%" }}
                 viewBox={`0 0 256 256`}
