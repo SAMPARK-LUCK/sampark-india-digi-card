@@ -4,7 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/components/ui/use-toast";
-import { Download, Share } from "lucide-react";
+import { Download, Share, Contact } from "lucide-react";
 import { CardInfo } from "@/types";
 import QRCode from "react-qr-code";
 
@@ -28,10 +28,8 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardInfo }) => {
   const generateVCardData = (info: CardInfo): string => {
     let vCard = "BEGIN:VCARD\nVERSION:3.0\n";
     if (info.name) vCard += `FN:${info.name}\n`;
-    if (info.title || info.company) {
-      vCard += `ORG:${info.company || ""}\n`;
-      if (info.title) vCard += `TITLE:${info.title}\n`;
-    }
+    if (info.title) vCard += `TITLE:${info.title}\n`;
+    if (info.company) vCard += `ORG:${info.company}\n`;
     if (info.email) vCard += `EMAIL:${info.email}\n`;
     if (info.phone) vCard += `TEL:${info.phone}\n`;
     if (info.website) vCard += `URL:${info.website}\n`;
@@ -94,36 +92,42 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardInfo }) => {
   };
 
   const shareCard = async () => {
-    if (!vCardData || !cardInfo.name) return;
-    
-    if (navigator.share) {
-      try {
-        const blob = new Blob([vCardData], { type: "text/vcard" });
-        const file = new File([blob], `${cardInfo.name}.vcf`, { type: "text/vcard" });
-        
-        await navigator.share({
-          title: `${cardInfo.name}'s Contact Card`,
-          text: `Contact information for ${cardInfo.name}`,
-          files: [file],
-        });
-        
+    try {
+      if (!vCardData || !cardInfo.name) return;
+      
+      const blob = new Blob([vCardData], { type: "text/vcard" });
+      const file = new File([blob], `${cardInfo.name}.vcf`, { type: "text/vcard" });
+      
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            title: `${cardInfo.name}'s Contact Card`,
+            text: `Contact information for ${cardInfo.name}`,
+            files: [file],
+          });
+          
+          toast({
+            title: "Shared Successfully",
+            description: "Your contact card has been shared.",
+          });
+        } catch (err) {
+          console.error("Error sharing:", err);
+          toast({
+            title: "Sharing Failed",
+            description: "Unable to share your contact card. Try downloading instead.",
+          });
+        }
+      } else {
         toast({
-          title: "Shared Successfully",
-          description: "Your contact card has been shared.",
-        });
-      } catch (err) {
-        console.error("Error sharing:", err);
-        toast({
-          title: "Sharing Failed",
-          description: "Unable to share your contact card. Try downloading instead.",
-          variant: "destructive",
+          title: "Sharing Not Supported",
+          description: "Your browser doesn't support sharing files. Try downloading instead.",
         });
       }
-    } else {
+    } catch (error) {
+      console.error("Share error:", error);
       toast({
-        title: "Sharing Not Supported",
-        description: "Your browser doesn't support direct sharing. Try downloading instead.",
-        variant: "destructive",
+        title: "Sharing Failed",
+        description: "Unable to share. Try downloading the vCard directly.",
       });
     }
   };
@@ -149,14 +153,13 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardInfo }) => {
         <CardContent className="pt-6">
           <TabsContent value="qrcode" className="flex flex-col items-center space-y-4">
             <div className="relative w-full max-w-xs mx-auto">
-              {/* Using react-qr-code directly for better compatibility with vCard format */}
               <QRCode 
                 value={vCardData}
                 size={200}
                 className="w-full h-auto drop-shadow-md qr-code-svg"
                 level="M"
               />
-              <p className="text-center text-sm text-muted-foreground mt-2">
+              <p className="text-center text-sm text-muted-foreground mt-2 font-medium">
                 Scan to add contact
               </p>
             </div>
@@ -182,7 +185,7 @@ const QRCodeGenerator: React.FC<QRCodeGeneratorProps> = ({ cardInfo }) => {
                 onClick={downloadVCard} 
                 className="flex-1"
               >
-                <Download className="mr-2 h-4 w-4" />
+                <Contact className="mr-2 h-4 w-4" />
                 Download vCard
               </Button>
               

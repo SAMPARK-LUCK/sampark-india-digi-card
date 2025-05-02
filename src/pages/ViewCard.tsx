@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { CardInfo, CardCollection } from "@/types";
 import CardPreview from "@/components/CardPreview";
 import QRCodeGenerator from "@/components/QRCodeGenerator";
-import { ArrowLeft, Edit, Download } from "lucide-react";
+import { ArrowLeft, Edit, Download, Contact } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 const ViewCard = () => {
@@ -39,10 +39,8 @@ const ViewCard = () => {
   const generateVCardData = (info: CardInfo): string => {
     let vCard = "BEGIN:VCARD\nVERSION:3.0\n";
     if (info.name) vCard += `FN:${info.name}\n`;
-    if (info.title || info.company) {
-      vCard += `ORG:${info.company || ""}\n`;
-      if (info.title) vCard += `TITLE:${info.title}\n`;
-    }
+    if (info.title) vCard += `TITLE:${info.title}\n`;
+    if (info.company) vCard += `ORG:${info.company}\n`;
     if (info.email) vCard += `EMAIL:${info.email}\n`;
     if (info.phone) vCard += `TEL:${info.phone}\n`;
     if (info.website) vCard += `URL:${info.website}\n`;
@@ -119,7 +117,7 @@ const ViewCard = () => {
               variant="secondary"
               className="w-full mt-2"
             >
-              <Download className="mr-2 h-4 w-4" />
+              <Contact className="mr-2 h-4 w-4" />
               Download Contact (VCF)
             </Button>
           </div>

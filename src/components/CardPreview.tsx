@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -45,10 +44,8 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
   const generateVCardData = (info: CardInfo): string => {
     let vCard = "BEGIN:VCARD\nVERSION:3.0\n";
     if (info.name) vCard += `FN:${info.name}\n`;
-    if (info.title || info.company) {
-      vCard += `ORG:${info.company || ""}\n`;
-      if (info.title) vCard += `TITLE:${info.title}\n`;
-    }
+    if (info.title) vCard += `TITLE:${info.title}\n`;
+    if (info.company) vCard += `ORG:${info.company}\n`;
     if (info.email) vCard += `EMAIL:${info.email}\n`;
     if (info.phone) vCard += `TEL:${info.phone}\n`;
     if (info.website) vCard += `URL:${info.website}\n`;
@@ -285,8 +282,8 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
             )}
           </div>
           
-          {/* QR Code - Now using vCard data directly for contact info */}
-          <div className="flex justify-end items-center">
+          {/* QR Code - Now using vCard data directly */}
+          <div className="flex flex-col justify-end items-end">
             <div className="bg-white p-1 rounded">
               <QRCode
                 value={vCardData}
@@ -295,6 +292,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
                 viewBox={`0 0 256 256`}
               />
             </div>
+            <p className="text-xs mt-1 text-center w-full">Scan to add contact</p>
           </div>
         </div>
         
