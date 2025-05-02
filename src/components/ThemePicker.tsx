@@ -40,6 +40,11 @@ const themes = [
     class: "card-rathi-group",
   },
   {
+    id: "card-rathi-group1",
+    name: "Rathi Group1",
+    class: "card-rathi-group1",
+  },
+  {
     id: "card-modern",
     name: "Modern",
     class: "card-modern",
