@@ -177,15 +177,26 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
           </div>
         </div>
         
-        {/* Company banner with Counter-Strike font */}
+        {/* Company banner with Counter-Strike font and logo */}
         <div className="bg-yellow-400 p-2">
           <div className="flex justify-between items-center">
-            <h3 className="text-lg font-bold counter-strike-font text-black">
-              {company || "COMPANY NAME"}
-            </h3>
-            <p className="text-xs text-black">
-              {company ? "An ISO 9001:2008 Certified Co." : ""}
-            </p>
+            <div className="flex items-center space-x-3">
+              {/* Company logo in yellow box */}
+              {companyLogo ? (
+                <img 
+                  src={companyLogo} 
+                  alt="Company Logo" 
+                  className="h-8 w-auto object-contain" 
+                />
+              ) : (
+                <div className="h-8 w-8 bg-white/80 rounded-sm flex items-center justify-center text-xs text-gray-400">
+                  Logo
+                </div>
+              )}
+              <h3 className="text-lg font-bold counter-strike-font text-black">
+                {company || "COMPANY NAME"}
+              </h3>
+            </div>
           </div>
         </div>
         
@@ -227,19 +238,11 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
           </div>
         </div>
         
-        {/* Company logo at top */}
-        <div className="px-4 pb-3 flex justify-between items-center">
-          {companyLogo ? (
-            <img 
-              src={companyLogo} 
-              alt="Company Logo" 
-              className="h-10 w-auto object-contain" 
-            />
-          ) : (
-            <div className="h-10 w-20 bg-gray-100 flex items-center justify-center text-xs text-gray-400">
-              Company Logo
-            </div>
-          )}
+        {/* ISO certification line at bottom */}
+        <div className="px-4 pb-3 text-right">
+          <p className="text-xs text-gray-600">
+            {company ? "An ISO 9001:2008 Certified Co." : ""}
+          </p>
         </div>
       </Card>
     );
