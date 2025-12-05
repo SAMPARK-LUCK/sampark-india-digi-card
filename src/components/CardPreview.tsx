@@ -250,7 +250,7 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
                 Logo
               </div>
             )}
-            <h3 className="text-base font-bold counter-strike-font text-black whitespace-nowrap overflow-hidden text-ellipsis">
+            <h3 className="text-sm font-bold counter-strike-font text-black flex-1 leading-tight">
               {company || "COMPANY NAME"}
             </h3>
           </div>
