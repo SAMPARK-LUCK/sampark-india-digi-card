@@ -215,7 +215,6 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
               <h2 className="text-xl font-bold uppercase tracking-wide">
                 {name || "FULL NAME"}
               </h2>
-              <div className="w-12 h-0.5 bg-red-600 mb-1" />
               <p className="text-sm font-medium">
                 {title || "Job Title"}
               </p>
@@ -244,14 +243,14 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
               <img 
                 src={companyLogo} 
                 alt="Company Logo" 
-                className="h-8 w-auto object-contain" 
+                className="h-12 w-auto object-contain" 
               />
             ) : (
-              <div className="h-8 w-8 bg-white/80 rounded-sm flex items-center justify-center text-xs text-gray-400">
+              <div className="h-12 w-12 bg-white/80 rounded-sm flex items-center justify-center text-xs text-gray-400">
                 Logo
               </div>
             )}
-            <h3 className="text-lg font-bold counter-strike-font text-black">
+            <h3 className="text-base font-bold counter-strike-font text-black whitespace-nowrap overflow-hidden text-ellipsis">
               {company || "COMPANY NAME"}
             </h3>
           </div>
@@ -260,6 +259,13 @@ const CardPreview: React.FC<CardPreviewProps> = ({ cardInfo }) => {
         {/* Contact information and QR code */}
         <div className="p-4 grid grid-cols-2 gap-4">
           <div className="space-y-2">
+            {address && (
+              <div className="flex items-start space-x-2">
+                <span className="text-sm">📍</span>
+                <span className="text-xs leading-tight">{address}</span>
+              </div>
+            )}
+            
             {phone && (
               <div className="flex items-center space-x-2">
                 <span className="text-sm">📞</span>
